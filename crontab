@@ -1,2 +1,6 @@
-0 10 * * 1-5 root python /app/main.py >> /var/log/cron.log 2>&1
+# Correct crontab content
+crontab_content = "0 10 * * 1-5 root python /app/main.py >> /var/log/cron.log 2>&1\n"
 
+crontab_path = os.path.join(project_dir, 'crontab')
+with open(crontab_path, 'w') as file:
+    file.write(crontab_content)
