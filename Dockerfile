@@ -1,9 +1,9 @@
 FROM python:3.9-slim
 
-# Install cron and other necessary packages
+# Install cron
 RUN apt-get update && apt-get install -y cron
 
-# Set environment variables (these should be set in the environment where you build and run the container)
+# Set environment variables (You should replace these with your actual keys)
 ARG ALPACA_API_KEY
 ARG ALPACA_API_SECRET
 ARG OPENAI_API_KEY
@@ -33,5 +33,5 @@ RUN crontab /etc/cron.d/trading-cron
 # Create the log file to be able to run tail
 RUN touch /var/log/cron.log
 
-# Run the command on container startup
-CMD cron -f && tail -f /var/log/cron.log
+# Run the cron service in the foreground
+CMD cron -f
