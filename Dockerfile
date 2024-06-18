@@ -34,4 +34,4 @@ RUN crontab /etc/cron.d/trading-cron
 RUN touch /var/log/cron.log
 
 # Run the cron service in the foreground
-CMD cron -f
+CMD ["cron", "-f"]
