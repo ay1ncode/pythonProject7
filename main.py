@@ -60,7 +60,7 @@ def execute_trade(signal, ticker):
         try:
             api.submit_order(
                 symbol=ticker,
-                qty=5,
+                qty=2,
                 side='buy',
                 type='market',
                 time_in_force='gtc'
