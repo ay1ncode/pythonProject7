@@ -1,4 +1,3 @@
 * * * * * root env > /var/log/cron_env.log
 * * * * * root echo "Cron job executed at $(date)" >> /var/log/cron_debug.log
 * * * * * root python /app/main.py >> /var/log/cron.log 2>&1
-
