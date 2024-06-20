@@ -28,10 +28,10 @@ COPY crontab /etc/cron.d/trading-cron
 # RUN chmod 0644 /etc/cron.d/trading-cron
 
 # Apply cron job
-RUN crontab /etc/cron.d/trading-cron
+# RUN crontab /etc/cron.d/trading-cron
 
 # Create the log file to be able to run tail
-RUN touch /var/log/cron.log
+# RUN touch /var/log/cron.log
 
 # Run the cron service in the foreground
 CMD ["cron", "-f"]
