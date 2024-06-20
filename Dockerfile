@@ -25,7 +25,7 @@ COPY . /app
 COPY crontab /etc/cron.d/trading-cron
 
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/trading-cron
+# RUN chmod 0644 /etc/cron.d/trading-cron
 
 # Apply cron job
 RUN crontab /etc/cron.d/trading-cron
