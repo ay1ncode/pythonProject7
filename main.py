@@ -12,14 +12,15 @@ BASE_URL = 'https://paper-api.alpaca.markets'  # Use the paper trading URL for t
 # Initialize the Alpaca API
 api = tradeapi.REST(API_KEY, API_SECRET, BASE_URL, api_version='v2')
 
+# Set the quantity for buy orders
+BUY_QUANTITY = 3
 
 def get_stock_data(ticker, period='1mo', interval='1d'):
     stock = yf.Ticker(ticker)
     hist = stock.history(period=period, interval=interval)
     return hist
 
-
-def moving_average_strategy(ticker, short_window=10, long_window=40):
+def moving_average_strategy(ticker, short_window=20, long_window=40):
     data = get_stock_data(ticker)
 
     if data.empty:
@@ -41,7 +42,20 @@ def moving_average_strategy(ticker, short_window=10, long_window=40):
 
     return signal, data
 
+def check_funds_for_purchase(ticker, quantity):
+    try:
+        account = api.get_account()
+        buying_power = float(account.buying_power)
+        current_price = float(api.get_last_trade(ticker).price)
+        required_funds = current_price * quantity
 
+        if required_funds > buying_power:
+            print(f"Insufficient funds to buy {quantity} shares of {ticker}. Required: {required_funds}, Available: {buying_power}")
+            return False
+        return True
+    except Exception as e:
+        print(f"Error checking funds for purchase: {e}")
+        return False
 
 def execute_trade(signal, ticker):
     # Get current position
@@ -56,33 +70,33 @@ def execute_trade(signal, ticker):
             return
 
     if signal == 'BUY' and qty < 20:
-        # Place a buy order
-        try:
-            api.submit_order(
-                symbol=ticker,
-                qty=2,
-                side='buy',
-                type='market',
-                time_in_force='gtc'
-            )
-            print(f"BUY order placed for {ticker}")
-        except Exception as e:
-            print(f"Error placing BUY order for {ticker}: {e}")
+        if check_funds_for_purchase(ticker, BUY_QUANTITY):  # Use the BUY_QUANTITY variable
+            # Place a buy order
+            try:
+                order = api.submit_order(
+                    symbol=ticker,
+                    qty=BUY_QUANTITY,  # Use the BUY_QUANTITY variable
+                    side='buy',
+                    type='market',
+                    time_in_force='gtc'
+                )
+                print(f"BUY order placed for {ticker}, order ID: {order.id}")
+            except Exception as e:
+                print(f"Error placing BUY order for {ticker}: {e}")
 
     elif signal == 'SELL' and qty > 0:
         # Place a sell order
         try:
-            api.submit_order(
+            order = api.submit_order(
                 symbol=ticker,
                 qty=qty,
                 side='sell',
                 type='market',
                 time_in_force='gtc'
             )
-            print(f"SELL order placed for {ticker}")
+            print(f"SELL order placed for {ticker}, order ID: {order.id}")
         except Exception as e:
             print(f"Error placing SELL order for {ticker}: {e}")
-
 
 def main():
     ticker = 'PLTR'  # Example ticker, you can change this
@@ -96,8 +110,6 @@ def main():
 
     if signal == 'BUY' or signal == 'SELL':
         execute_trade(signal, ticker)
-
-
 
 if __name__ == "__main__":
     main()
